@@ -29,10 +29,6 @@
       left: 0;
       transform-origin: top left;
     }
-
-    canvas:hover {
-      cursor: pointer;
-    }
   </style>
 </head>
 
@@ -72,86 +68,84 @@
           x: center[0],
           y: center[1]
         }; //  中心点
-        this.fillStyle = "#" + Math.random().toString(16).substr(2, 6) + "aa";
+        this.fillStyle = "#" + Math.random().toString(16).substr(2, 6) + "ee";
         this.r = 0; //  初始转动角度
         this.side = side; // 多边形的边数目
-        this.segment = 15 * ratio; //  多边形中心点距离各个顶点的距离
+        this.segment = 30; //  多边形中心点距离各个顶点的距离
         this.vertexes = []; // 顶点数组
         this.graDire = -Math.PI / 2; //  加速度的方向
         this.graVlue = 1 //  加速度的数值
         this.dangle = (Math.random() * 2 * Math.PI); //  移动的方向 弧度表示
-        this.speed = (2 * Math.random() + 5) / this.side ** 2; // 移动方向的速度
+        this.speed = (10 * Math.random() + 5) / this.side ** 2; // 移动方向的速度
         this.vectorX = Math.cos(this.dangle) * this.speed; //  x方向的分速度
         this.vectorY = -Math.sin(this.dangle) * this.speed; //  y方向的分速度
+        //  离屏canvas
+        this.cacheCanv = document.createElement("canvas");
+        this.cacheCont = this.cacheCanv.getContext("2d");
+        this.cacheCanv.width = 2 * this.segment * ratio;
+        this.cacheCanv.height = 2 * this.segment * ratio;
+        this.cacheCanv.style.transform = `scale(${1 / ratio})`
         //
         this.updateVertexes();
       }
       Polygon.prototype.updateVertexes = function () {
         for (let i = 0; i < this.side; i++) {
           this.vertexes[i] = {
-            x: this.center.x +
+            cx: this.segment +
               this.segment *
               Math.cos((Math.PI * 2 * (i + 1)) / this.side + this.dangle + this.r),
-            y: this.center.y +
+            cy: this.segment +
               this.segment *
               Math.sin((Math.PI * 2 * (i + 1)) / this.side + this.dangle + this.r)
           };
         }
       };
       Polygon.prototype.update = function () {
-        //  碰墙反弹
         //  -cox(x) = cos(Math.PI - x)
-        // if (this.center.x <= 0 || this.center.x >= width) {
-        //   this.dangle = Math.PI - this.dangle;
-        //   this.vectorX = Math.cos(this.dangle) * this.speed;
-        // }
+        if (this.center.x <= 0 || this.center.x >= width) {
+          this.dangle = Math.PI - this.dangle;
+          this.vectorX = Math.cos(this.dangle) * this.speed;
+        }
         //  -sin(y) = sin(-y)
-        // if (this.center.y <= 0 || this.center.y >= height) {
-        //   this.dangle = -this.dangle;
-        //   this.vectorY = -Math.sin(this.dangle) * this.speed;
-        // }
-        //  穿墙循环
-        if (this.center.x <= -this.segment) {
-          this.center.x = width + this.segment
-        } else if (this.center.x >= width + this.segment) {
-          this.center.x = -this.segment
+        if (this.center.y <= 0 || this.center.y >= height) {
+          this.dangle = -this.dangle;
+          this.vectorY = -Math.sin(this.dangle) * this.speed;
         }
-        if (this.center.y <= -this.segment) {
-          this.center.y = height + this.segment
-        } else if (this.center.y >= height + this.segment) {
-          this.center.y = -this.segment
-        }
-
         this.center.x += this.vectorX;
         this.center.y += this.vectorY;
         this.r = this.r + 0.005;
         this.updateVertexes();
       };
       Polygon.prototype.paint = function () {
-        contex.fillStyle = this.fillStyle;
-        contex.beginPath();
+        contex.drawImage(this.cacheCanv, this.center.x - this.segment, this.center.y - this.segment)
+      };
+      Polygon.prototype.cache = function () {
+        this.cacheCont.clearRect(0, 0, this.segment * 2, this.segment * 2)
+        this.cacheCont.fillStyle = this.fillStyle;
+        this.cacheCont.beginPath();
         for (let k = 0; k < this.vertexes.length + 1; k++) {
           if (k === 0) {
-            contex.moveTo(this.vertexes[k].x, this.vertexes[k].y);
+            this.cacheCont.moveTo(this.vertexes[k].cx, this.vertexes[k].cy);
           } else if (k === this.side) {
-            contex.lineTo(this.vertexes[0].x, this.vertexes[0].y);
+            this.cacheCont.lineTo(this.vertexes[0].cx, this.vertexes[0].cy);
           } else {
-            contex.lineTo(this.vertexes[k].x, this.vertexes[k].y);
+            this.cacheCont.lineTo(this.vertexes[k].cx, this.vertexes[k].cy);
           }
         }
-        contex.fill();
-        contex.closePath();
+        this.cacheCont.fill();
+        this.cacheCont.closePath();
         this.vectorX = Math.cos(this.dangle) * this.speed;
         this.vectorY = -Math.sin(this.dangle) * this.speed;
         this.update();
       };
+
       const polygonArr = createPolygon();
 
       function createPolygon() {
         let res = [];
         for (let i = 0; i < 100; i++) {
-          let side = Math.floor(Math.random() * 4 + 3);
-          let x = width / 2 //Math.floor(Math.random() * width);
+          let side = Math.floor(Math.random() * 3 + 3);
+          let x = width / 2 // Math.floor(Math.random() * width);
           let y = height / 2 // Math.floor(Math.random() * height);
           res.push(new Polygon([x, y], side));
         }
@@ -161,16 +155,12 @@
       function paint() {
         contex.clearRect(0, 0, width, height);
         for (let i = 0; i < polygonArr.length; i++) {
+          polygonArr[i].cache();
           polygonArr[i].paint();
         }
         ID = requestAnimationFrame(paint);
       }
       paint();
-      canvas.addEventListener("click", function (e) {
-        let side = Math.floor(Math.random() * 4 + 3);
-        let newP = new Polygon([e.pageX * ratio, e.pageY * ratio], side);
-        polygonArr.push(newP);
-      }, false)
     });
   </script>
 </body>
