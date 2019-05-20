@@ -149,8 +149,14 @@
             contex.lineTo(this.vertexes[k].x, this.vertexes[k].y);
           }
         }
+        
         contex.fill();
         contex.closePath();
+        // contex.beginPath();
+        // contex.strokeStyle = "#181818"
+        // contex.arc(this.center.x, this.center.y, this.segment, 0, Math.PI * 2, true);
+        // contex.stroke();
+        // contex.closePath()
         this.vectorX = Math.cos(this.dangle) * this.speed;
         this.vectorY = -Math.sin(this.dangle) * this.speed;
         this.update();
@@ -159,7 +165,7 @@
 
       function createPolygon() {
         let res = [];
-        for (let i = 0; i < 365; i++) {
+        for (let i = 0; i < 100; i++) {
           let side = Math.floor(Math.random() * 4 + 3);
           let x = width / 2 //Math.floor(Math.random() * width);
           let y = height / 2 // Math.floor(Math.random() * height);
@@ -167,10 +173,23 @@
         }
         return res;
       }
-
       function paint() {
         contex.clearRect(0, 0, width, height);
         for (let i = 0; i < polygonArr.length; i++) {
+          for(j = i + 1; j < polygonArr.length; j++) {
+            let sameSide = polygonArr[i].side === polygonArr[j].side
+            let len_2 = (polygonArr[i].center.x - polygonArr[j].center.x) ** 2 + (polygonArr[i].center.y - polygonArr[j].center.y) ** 2
+            let len = Math.sqrt(len_2);
+            if(len < 300 * ratio && sameSide) {
+              let alpha = (1 - (len / 200 * ratio)).toString();
+              contex.beginPath();
+              contex.strokeStyle = `rgba(255,255,255,${alpha})`;
+              contex.moveTo(polygonArr[i].center.x, polygonArr[i].center.y);
+              contex.lineTo(polygonArr[j].center.x, polygonArr[j].center.y);
+              contex.stroke();
+              contex.closePath();
+            }
+          }
           polygonArr[i].paint();
         }
         ID = requestAnimationFrame(paint);
