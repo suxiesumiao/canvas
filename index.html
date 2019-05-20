@@ -41,6 +41,7 @@
   <canvas id="canvas"></canvas>
   <script>
     document.addEventListener("DOMContentLoaded", function (event) {
+      const year = new Date().getFullYear();
       let ID = 0;
       let canvas = document.getElementById('canvas')
       const contex = canvas.getContext("2d");
@@ -129,6 +130,8 @@
         this.center.x += this.vectorX;
         this.center.y += this.vectorY;
         this.r = this.r + 0.005;
+
+        // this.segment = (this.segment < 15 * ratio ? this.segment + 0.01 : 15 * ratio)
         this.updateVertexes();
       };
       Polygon.prototype.paint = function () {
@@ -156,7 +159,7 @@
 
       function createPolygon() {
         let res = [];
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 365; i++) {
           let side = Math.floor(Math.random() * 4 + 3);
           let x = width / 2 //Math.floor(Math.random() * width);
           let y = height / 2 // Math.floor(Math.random() * height);
