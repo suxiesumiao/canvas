@@ -28,6 +28,7 @@
       top: 0;
       left: 0;
       transform-origin: top left;
+      -webkit-tap-highlight-color: transparent;
     }
 
     canvas:hover {
@@ -47,6 +48,7 @@
       let ratio = getPixelRatio(contex)
       let width = canvas.width = document.documentElement.clientWidth * ratio
       let height = canvas.height = document.documentElement.clientHeight * ratio
+      let maxLeng = Math.max(width, height) / 2
       // 高清屏幕缩放
       canvas.style.transform = `scale(${1 / ratio})`
       // 设备的像素比函数
@@ -61,8 +63,10 @@
       };
 
       window.addEventListener('orientationchange' in window ? orientationchange : 'resize', function () {
-        width = canvas.width = document.documentElement.clientWidth
-        height = canvas.heigt = document.documentElement.clientHeight
+        width = canvas.width = document.documentElement.clientWidth * ratio
+        height = canvas.heigt = document.documentElement.clientHeight * ratio
+        // alert(canvas.width)
+        // canvas.style.transform = `scale(${1 / ratio})`
         cancelAnimationFrame(ID);
         paint();
       });
@@ -72,7 +76,7 @@
           x: center[0],
           y: center[1]
         }; //  中心点
-        this.fillStyle = "#" + Math.random().toString(16).substr(2, 6) + "aa";
+        this.fillStyle = "#" + Math.random().toString(16).substr(2, 6);
         this.r = 0; //  初始转动角度
         this.side = side; // 多边形的边数目
         this.segment = 15 * ratio; //  多边形中心点距离各个顶点的距离
@@ -128,6 +132,9 @@
         this.updateVertexes();
       };
       Polygon.prototype.paint = function () {
+        // const radius = Math.sqrt((this.center.x - width / 2) ** 2 + (this.center.y - height / 2) ** 2);
+        // const alpha = Math.floor(radius * 100 / maxLeng).toString(16);
+        // console.log(alpha)
         contex.fillStyle = this.fillStyle;
         contex.beginPath();
         for (let k = 0; k < this.vertexes.length + 1; k++) {
