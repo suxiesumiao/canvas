@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
+  <title>canvas</title>
   <style>
     * {
       margin: 0;
@@ -149,7 +149,7 @@
             contex.lineTo(this.vertexes[k].x, this.vertexes[k].y);
           }
         }
-        
+
         contex.fill();
         contex.closePath();
         // contex.beginPath();
@@ -161,6 +161,26 @@
         this.vectorY = -Math.sin(this.dangle) * this.speed;
         this.update();
       };
+      /**
+      * { start } 起始标志位
+      */
+      Polygon.prototype.line = function (start) {
+        for (j = start + 1; j < polygonArr.length; j++) {
+          let sameSide = polygonArr[start].side === polygonArr[j].side
+          let len_2 = (polygonArr[start].center.x - polygonArr[j].center.x) ** 2 + (polygonArr[start].center.y - polygonArr[j].center.y) ** 2
+          let len = Math.sqrt(len_2);
+          if (len < 300 && sameSide) {
+            let alpha = (1 - (len / 300)).toString();
+            contex.beginPath();
+            contex.lineWidth = ratio;
+            contex.strokeStyle = `rgba(255,255,255,${alpha})`;
+            contex.moveTo(polygonArr[start].center.x, polygonArr[start].center.y);
+            contex.lineTo(polygonArr[j].center.x, polygonArr[j].center.y);
+            contex.stroke();
+            contex.closePath();
+          }
+        }
+      }
       const polygonArr = createPolygon();
 
       function createPolygon() {
@@ -176,20 +196,7 @@
       function paint() {
         contex.clearRect(0, 0, width, height);
         for (let i = 0; i < polygonArr.length; i++) {
-          for(j = i + 1; j < polygonArr.length; j++) {
-            let sameSide = polygonArr[i].side === polygonArr[j].side
-            let len_2 = (polygonArr[i].center.x - polygonArr[j].center.x) ** 2 + (polygonArr[i].center.y - polygonArr[j].center.y) ** 2
-            let len = Math.sqrt(len_2);
-            if(len < 300 * ratio && sameSide) {
-              let alpha = (1 - (len / 200 * ratio)).toString();
-              contex.beginPath();
-              contex.strokeStyle = `rgba(255,255,255,${alpha})`;
-              contex.moveTo(polygonArr[i].center.x, polygonArr[i].center.y);
-              contex.lineTo(polygonArr[j].center.x, polygonArr[j].center.y);
-              contex.stroke();
-              contex.closePath();
-            }
-          }
+          polygonArr[i].line(i); //  粒子之间连线
           polygonArr[i].paint();
         }
         ID = requestAnimationFrame(paint);
