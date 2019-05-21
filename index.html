@@ -12,7 +12,7 @@
     }
 
     html {
-      background-color: #181818;
+      background-color: #1a1f3a;
     }
 
     html,
@@ -185,12 +185,15 @@
 
       function createPolygon() {
         let res = [];
-        for (let i = 0; i < 100; i++) {
+        let x = width / 2;
+        let y = height / 2;
+        for (let i = 0; i < 50; i++) {
           let side = Math.floor(Math.random() * 4 + 3);
-          let x = width / 2 //Math.floor(Math.random() * width);
-          let y = height / 2 // Math.floor(Math.random() * height);
+          //let x = width / 2 //Math.floor(Math.random() * width);
+          //let y = height / 2 // Math.floor(Math.random() * height);
           res.push(new Polygon([x, y], side));
         }
+        res.push(new Polygon([x, y], 7));
         return res;
       }
       function paint() {
