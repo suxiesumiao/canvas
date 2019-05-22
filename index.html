@@ -107,7 +107,7 @@
       };
       Polygon.prototype.update = function () {
         if (RANDOM) {
-        //  碰墙反弹
+          //  碰墙反弹
           //-cox(x) = cos(Math.PI - x)
           //-sin(y) = sin(-y)
           if (this.center.x <= 0 || this.center.x >= width) {
@@ -120,17 +120,17 @@
             this.vectorY = -Math.sin(this.dangle) * this.speed;
           }
         } else {
-        //  穿墙循环
-        if (this.center.x <= -this.segment) {
-          this.center.x = width + this.segment
-        } else if (this.center.x >= width + this.segment) {
-          this.center.x = -this.segment
-        }
-        if (this.center.y <= -this.segment) {
-          this.center.y = height + this.segment
-        } else if (this.center.y >= height + this.segment) {
-          this.center.y = -this.segment
-        }
+          //  穿墙循环
+          if (this.center.x <= -this.segment) {
+            this.center.x = width + this.segment
+          } else if (this.center.x >= width + this.segment) {
+            this.center.x = -this.segment
+          }
+          if (this.center.y <= -this.segment) {
+            this.center.y = height + this.segment
+          } else if (this.center.y >= height + this.segment) {
+            this.center.y = -this.segment
+          }
         }
 
         this.center.x += this.vectorX;
@@ -155,7 +155,7 @@
             contex.lineTo(this.vertexes[k].x, this.vertexes[k].y);
           }
         }
-        
+
         contex.fill();
         contex.closePath();
         // contex.beginPath();
