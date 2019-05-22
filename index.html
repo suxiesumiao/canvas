@@ -12,7 +12,7 @@
     }
 
     html {
-      background-color: #181818;
+      background-color: #1a1f3a;
     }
 
     html,
@@ -41,6 +41,8 @@
   <canvas id="canvas"></canvas>
   <script>
     document.addEventListener("DOMContentLoaded", function (event) {
+      const RANDOM = new Date().getTime() % 2 === 0
+      console.log(RANDOM)
       const year = new Date().getFullYear();
       let ID = 0;
       let canvas = document.getElementById('canvas')
@@ -104,17 +106,20 @@
         }
       };
       Polygon.prototype.update = function () {
+        if (RANDOM) {
         //  碰墙反弹
-        //  -cox(x) = cos(Math.PI - x)
-        // if (this.center.x <= 0 || this.center.x >= width) {
-        //   this.dangle = Math.PI - this.dangle;
-        //   this.vectorX = Math.cos(this.dangle) * this.speed;
-        // }
-        //  -sin(y) = sin(-y)
-        // if (this.center.y <= 0 || this.center.y >= height) {
-        //   this.dangle = -this.dangle;
-        //   this.vectorY = -Math.sin(this.dangle) * this.speed;
-        // }
+          //-cox(x) = cos(Math.PI - x)
+          //-sin(y) = sin(-y)
+          if (this.center.x <= 0 || this.center.x >= width) {
+            this.dangle = Math.PI - this.dangle;
+            this.vectorX = Math.cos(this.dangle) * this.speed;
+          }
+
+          if (this.center.y <= 0 || this.center.y >= height) {
+            this.dangle = -this.dangle;
+            this.vectorY = -Math.sin(this.dangle) * this.speed;
+          }
+        } else {
         //  穿墙循环
         if (this.center.x <= -this.segment) {
           this.center.x = width + this.segment
@@ -125,6 +130,7 @@
           this.center.y = height + this.segment
         } else if (this.center.y >= height + this.segment) {
           this.center.y = -this.segment
+        }
         }
 
         this.center.x += this.vectorX;
@@ -173,15 +179,17 @@
         }
         return res;
       }
+
       function paint() {
         contex.clearRect(0, 0, width, height);
         for (let i = 0; i < polygonArr.length; i++) {
-          for(j = i + 1; j < polygonArr.length; j++) {
+          for (j = i + 1; j < polygonArr.length; j++) {
             let sameSide = polygonArr[i].side === polygonArr[j].side
-            let len_2 = (polygonArr[i].center.x - polygonArr[j].center.x) ** 2 + (polygonArr[i].center.y - polygonArr[j].center.y) ** 2
+            let len_2 = (polygonArr[i].center.x - polygonArr[j].center.x) ** 2 + (polygonArr[i].center.y -
+              polygonArr[j].center.y) ** 2
             let len = Math.sqrt(len_2);
-            if(len < 300 * ratio && sameSide) {
-              let alpha = (1 - (len / 200 * ratio)).toString();
+            if (len < 300 * ratio && sameSide) {
+              let alpha = (1 - (len / 300 * ratio)).toString();
               contex.beginPath();
               contex.strokeStyle = `rgba(255,255,255,${alpha})`;
               contex.moveTo(polygonArr[i].center.x, polygonArr[i].center.y);
