@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
+  <title>Birds Nest painted by canvas</title>
   <style>
     * {
       margin: 0;
@@ -79,7 +79,7 @@
           x: center[0],
           y: center[1]
         }; //  中心点
-        this.fillStyle = "#" + Math.random().toString(16).substr(2, 6);
+        this.fillStyle = "#" + Math.random().toString(16).substr(2, 6) + "dd";
         this.r = 0; //  初始转动角度
         this.side = side; // 多边形的边数目
         this.segment = 15 * ratio; //  多边形中心点距离各个顶点的距离
@@ -167,16 +167,39 @@
         this.vectorY = -Math.sin(this.dangle) * this.speed;
         this.update();
       };
+      /**
+      * { start } 起始标志位
+      */
+      Polygon.prototype.line = function (start) {
+        for (j = start + 1; j < polygonArr.length; j++) {
+          let sameSide = polygonArr[start].side === polygonArr[j].side
+          let len_2 = (polygonArr[start].center.x - polygonArr[j].center.x) ** 2 + (polygonArr[start].center.y - polygonArr[j].center.y) ** 2
+          let len = Math.sqrt(len_2);
+          if (len < 300 && sameSide) {
+            let alpha = (1 - (len / 300)).toString();
+            contex.beginPath();
+            contex.lineWidth = ratio;
+            contex.strokeStyle = `rgba(255,255,255,${alpha})`;
+            contex.moveTo(polygonArr[start].center.x, polygonArr[start].center.y);
+            contex.lineTo(polygonArr[j].center.x, polygonArr[j].center.y);
+            contex.stroke();
+            contex.closePath();
+          }
+        }
+      }
       const polygonArr = createPolygon();
 
       function createPolygon() {
         let res = [];
-        for (let i = 0; i < 100; i++) {
+        let x = width / 2;
+        let y = height / 2;
+        for (let i = 0; i < 50; i++) {
           let side = Math.floor(Math.random() * 4 + 3);
-          let x = width / 2 //Math.floor(Math.random() * width);
-          let y = height / 2 // Math.floor(Math.random() * height);
+          //let x = width / 2 //Math.floor(Math.random() * width);
+          //let y = height / 2 // Math.floor(Math.random() * height);
           res.push(new Polygon([x, y], side));
         }
+        res.push(new Polygon([x, y], 7));
         return res;
       }
 
