@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="theme-color" content="#1a1f3a">
   <title>Birds Nest painted by canvas</title>
   <style>
     * {
@@ -86,6 +87,7 @@
         this.vertexes = []; // 顶点数组
         this.graDire = -Math.PI / 2; //  加速度的方向
         this.graVlue = 1 //  加速度的数值
+        this.spinDire = 0.005  //  旋转方向
         this.dangle = (Math.random() * 2 * Math.PI); //  移动的方向 弧度表示
         this.speed = (2 * Math.random() + 5) / this.side ** 2; // 移动方向的速度
         this.vectorX = Math.cos(this.dangle) * this.speed; //  x方向的分速度
@@ -111,11 +113,12 @@
           //-cox(x) = cos(Math.PI - x)
           //-sin(y) = sin(-y)
           if (this.center.x <= 0 || this.center.x >= width) {
+            this.spinDire = -this.spinDire
             this.dangle = Math.PI - this.dangle;
             this.vectorX = Math.cos(this.dangle) * this.speed;
           }
-
           if (this.center.y <= 0 || this.center.y >= height) {
+            this.spinDire = -this.spinDire
             this.dangle = -this.dangle;
             this.vectorY = -Math.sin(this.dangle) * this.speed;
           }
@@ -123,20 +126,22 @@
           //  穿墙循环
           if (this.center.x <= -this.segment) {
             this.center.x = width + this.segment
+            this.spinDire = -this.spinDire
           } else if (this.center.x >= width + this.segment) {
             this.center.x = -this.segment
+            this.spinDire = -this.spinDire
           }
           if (this.center.y <= -this.segment) {
             this.center.y = height + this.segment
+            this.spinDire = -this.spinDire
           } else if (this.center.y >= height + this.segment) {
             this.center.y = -this.segment
+            this.spinDire = -this.spinDire
           }
         }
-
         this.center.x += this.vectorX;
         this.center.y += this.vectorY;
-        this.r = this.r + 0.005;
-
+        this.r = this.r + this.spinDire;
         // this.segment = (this.segment < 15 * ratio ? this.segment + 0.01 : 15 * ratio)
         this.updateVertexes();
       };
@@ -168,12 +173,13 @@
         this.update();
       };
       /**
-      * { start } 起始标志位
-      */
+       * { start } 起始标志位
+       */
       Polygon.prototype.line = function (start) {
         for (j = start + 1; j < polygonArr.length; j++) {
           let sameSide = polygonArr[start].side === polygonArr[j].side
-          let len_2 = (polygonArr[start].center.x - polygonArr[j].center.x) ** 2 + (polygonArr[start].center.y - polygonArr[j].center.y) ** 2
+          let len_2 = (polygonArr[start].center.x - polygonArr[j].center.x) ** 2 + (polygonArr[start].center.y -
+            polygonArr[j].center.y) ** 2
           let len = Math.sqrt(len_2);
           if (len < 300 && sameSide) {
             let alpha = (1 - (len / 300)).toString();
@@ -211,9 +217,10 @@
             let len_2 = (polygonArr[i].center.x - polygonArr[j].center.x) ** 2 + (polygonArr[i].center.y -
               polygonArr[j].center.y) ** 2
             let len = Math.sqrt(len_2);
-            if (len < 300 * ratio && sameSide) {
-              let alpha = (1 - (len / 300 * ratio)).toString();
+            if (len < 500 && sameSide) {
+              let alpha = (1 - (len / 500)).toString();
               contex.beginPath();
+              contex.lineWidth = ratio;
               contex.strokeStyle = `rgba(255,255,255,${alpha})`;
               contex.moveTo(polygonArr[i].center.x, polygonArr[i].center.y);
               contex.lineTo(polygonArr[j].center.x, polygonArr[j].center.y);
