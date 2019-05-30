@@ -5,14 +5,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
+  <meta name="theme-color" content="#1a1f3a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#1a1f3a">
+  <title>Birds Nest painted by canvas</title>
   <style>
     * {
       margin: 0;
     }
 
     html {
-      background-color: #181818;
+      background-color: #1a1f3a;
     }
 
     html,
@@ -28,6 +31,11 @@
       top: 0;
       left: 0;
       transform-origin: top left;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    canvas:hover {
+      cursor: pointer;
     }
   </style>
 </head>
@@ -36,6 +44,9 @@
   <canvas id="canvas"></canvas>
   <script>
     document.addEventListener("DOMContentLoaded", function (event) {
+      const RANDOM = new Date().getTime() % 2 === 0
+      console.log(RANDOM)
+      const year = new Date().getFullYear();
       let ID = 0;
       let canvas = document.getElementById('canvas')
       const contex = canvas.getContext("2d");
@@ -43,6 +54,8 @@
       let ratio = getPixelRatio(contex)
       let width = canvas.width = document.documentElement.clientWidth * ratio
       let height = canvas.height = document.documentElement.clientHeight * ratio
+      const maxLeng = Math.max(width, height) / 2
+      const minLeng = Math.min(width, height) / 2
       // 高清屏幕缩放
       canvas.style.transform = `scale(${1 / ratio})`
       // 设备的像素比函数
@@ -57,8 +70,10 @@
       };
 
       window.addEventListener('orientationchange' in window ? orientationchange : 'resize', function () {
-        width = canvas.width = document.documentElement.clientWidth
-        height = canvas.heigt = document.documentElement.clientHeight
+        width = canvas.width = document.documentElement.clientWidth * ratio
+        height = canvas.heigt = document.documentElement.clientHeight * ratio
+        // alert(canvas.width)
+        // canvas.style.transform = `scale(${1 / ratio})`
         cancelAnimationFrame(ID);
         paint();
       });
@@ -68,85 +83,127 @@
           x: center[0],
           y: center[1]
         }; //  中心点
-        this.fillStyle = "#" + Math.random().toString(16).substr(2, 6) + "ee";
+        this.fillStyle = "#" + Math.random().toString(16).substr(2, 6) + "dd";
         this.r = 0; //  初始转动角度
         this.side = side; // 多边形的边数目
-        this.segment = 30; //  多边形中心点距离各个顶点的距离
+        this.segment = 15 * ratio; //  多边形中心点距离各个顶点的距离
         this.vertexes = []; // 顶点数组
         this.graDire = -Math.PI / 2; //  加速度的方向
         this.graVlue = 1 //  加速度的数值
+        this.spinDire = 0.005  //  旋转方向
         this.dangle = (Math.random() * 2 * Math.PI); //  移动的方向 弧度表示
-        this.speed = (10 * Math.random() + 5) / this.side ** 2; // 移动方向的速度
+        this.speed = (2 * Math.random() + 5) / this.side ** 2; // 移动方向的速度
         this.vectorX = Math.cos(this.dangle) * this.speed; //  x方向的分速度
         this.vectorY = -Math.sin(this.dangle) * this.speed; //  y方向的分速度
-        //  离屏canvas
-        this.cacheCanv = document.createElement("canvas");
-        this.cacheCont = this.cacheCanv.getContext("2d");
-        this.cacheCanv.width = 2 * this.segment * ratio;
-        this.cacheCanv.height = 2 * this.segment * ratio;
-        this.cacheCanv.style.transform = `scale(${1 / ratio})`
         //
         this.updateVertexes();
       }
       Polygon.prototype.updateVertexes = function () {
         for (let i = 0; i < this.side; i++) {
           this.vertexes[i] = {
-            cx: this.segment +
+            x: this.center.x +
               this.segment *
               Math.cos((Math.PI * 2 * (i + 1)) / this.side + this.dangle + this.r),
-            cy: this.segment +
+            y: this.center.y +
               this.segment *
               Math.sin((Math.PI * 2 * (i + 1)) / this.side + this.dangle + this.r)
           };
         }
       };
       Polygon.prototype.update = function () {
-        //  -cox(x) = cos(Math.PI - x)
-        if (this.center.x <= 0 || this.center.x >= width) {
-          this.dangle = Math.PI - this.dangle;
-          this.vectorX = Math.cos(this.dangle) * this.speed;
-        }
-        //  -sin(y) = sin(-y)
-        if (this.center.y <= 0 || this.center.y >= height) {
-          this.dangle = -this.dangle;
-          this.vectorY = -Math.sin(this.dangle) * this.speed;
+        if (RANDOM) {
+          //  碰墙反弹
+          //-cox(x) = cos(Math.PI - x)
+          //-sin(y) = sin(-y)
+          if (this.center.x <= 0 || this.center.x >= width) {
+            this.spinDire = -this.spinDire
+            this.dangle = Math.PI - this.dangle;
+            this.vectorX = Math.cos(this.dangle) * this.speed;
+          }
+          if (this.center.y <= 0 || this.center.y >= height) {
+            this.spinDire = -this.spinDire
+            this.dangle = -this.dangle;
+            this.vectorY = -Math.sin(this.dangle) * this.speed;
+          }
+        } else {
+          //  穿墙循环
+          if (this.center.x <= -this.segment) {
+            this.center.x = width + this.segment
+            this.spinDire = -this.spinDire
+          } else if (this.center.x >= width + this.segment) {
+            this.center.x = -this.segment
+            this.spinDire = -this.spinDire
+          }
+          if (this.center.y <= -this.segment) {
+            this.center.y = height + this.segment
+            this.spinDire = -this.spinDire
+          } else if (this.center.y >= height + this.segment) {
+            this.center.y = -this.segment
+            this.spinDire = -this.spinDire
+          }
         }
         this.center.x += this.vectorX;
         this.center.y += this.vectorY;
-        this.r = this.r + 0.005;
+        this.r = this.r + this.spinDire;
+        // this.segment = (this.segment < 15 * ratio ? this.segment + 0.01 : 15 * ratio)
         this.updateVertexes();
       };
       Polygon.prototype.paint = function () {
-        contex.drawImage(this.cacheCanv, this.center.x - this.segment, this.center.y - this.segment)
-      };
-      Polygon.prototype.cache = function () {
-        this.cacheCont.clearRect(0, 0, this.segment * 2, this.segment * 2)
-        this.cacheCont.fillStyle = this.fillStyle;
-        this.cacheCont.beginPath();
+        // const radius = Math.sqrt((this.center.x - width / 2) ** 2 + (this.center.y - height / 2) ** 2);
+        // const alpha = Math.floor(radius * 100 / maxLeng).toString(16);
+        // console.log(alpha)
+        contex.fillStyle = this.fillStyle;
+        contex.beginPath();
         for (let k = 0; k < this.vertexes.length + 1; k++) {
           if (k === 0) {
-            this.cacheCont.moveTo(this.vertexes[k].cx, this.vertexes[k].cy);
+            contex.moveTo(this.vertexes[k].x, this.vertexes[k].y);
           } else if (k === this.side) {
-            this.cacheCont.lineTo(this.vertexes[0].cx, this.vertexes[0].cy);
+            contex.lineTo(this.vertexes[0].x, this.vertexes[0].y);
           } else {
-            this.cacheCont.lineTo(this.vertexes[k].cx, this.vertexes[k].cy);
+            contex.lineTo(this.vertexes[k].x, this.vertexes[k].y);
           }
         }
-        this.cacheCont.fill();
-        this.cacheCont.closePath();
+
+        contex.fill();
+        contex.closePath();
+        // contex.beginPath();
+        // contex.strokeStyle = "#181818"
+        // contex.arc(this.center.x, this.center.y, this.segment, 0, Math.PI * 2, true);
+        // contex.stroke();
+        // contex.closePath()
         this.vectorX = Math.cos(this.dangle) * this.speed;
         this.vectorY = -Math.sin(this.dangle) * this.speed;
-        this.update();
+        // this.update();
       };
-
+      /**
+       * { start } 起始标志位
+       */
+      Polygon.prototype.line = function (start) {
+        for (j = start + 1; j < polygonArr.length; j++) {
+          let sameSide = polygonArr[start].side === polygonArr[j].side
+          let len_2 = (polygonArr[start].center.x - polygonArr[j].center.x) ** 2 + (polygonArr[start].center.y -
+            polygonArr[j].center.y) ** 2
+          let len = Math.sqrt(len_2);
+          if (len < 300 && sameSide) {
+            let alpha = (1 - (len / 300)).toString();
+            contex.beginPath();
+            contex.lineWidth = ratio;
+            contex.strokeStyle = `rgba(255,255,255,${alpha})`;
+            contex.moveTo(polygonArr[start].center.x, polygonArr[start].center.y);
+            contex.lineTo(polygonArr[j].center.x, polygonArr[j].center.y);
+            contex.stroke();
+            contex.closePath();
+          }
+        }
+      }
       const polygonArr = createPolygon();
 
       function createPolygon() {
         let res = [];
         for (let i = 0; i < 100; i++) {
-          let side = Math.floor(Math.random() * 3 + 3);
-          let x = width / 2 // Math.floor(Math.random() * width);
-          let y = height / 2 // Math.floor(Math.random() * height);
+          let side = 6//Math.floor(Math.random() * 4 + 3);
+          let x = Math.random() * Math.cos(Math.random() * Math.PI) * minLeng + width / 2   //Math.floor(Math.random() * width);
+          let y = Math.random() * Math.sin((Math.random() - 0.5) * Math.PI) * minLeng + height / 2  //Math.floor(Math.random() * height);
           res.push(new Polygon([x, y], side));
         }
         return res;
@@ -155,12 +212,21 @@
       function paint() {
         contex.clearRect(0, 0, width, height);
         for (let i = 0; i < polygonArr.length; i++) {
-          polygonArr[i].cache();
           polygonArr[i].paint();
         }
         ID = requestAnimationFrame(paint);
+        contex.beginPath();
+        contex.strokeStyle = "#ff0000"
+        contex.arc(width / 2, height / 2, minLeng, 0, Math.PI * 2, true)
+        contex.stroke()
+        contex.closePath();
       }
       paint();
+      canvas.addEventListener("click", function (e) {
+        let side = Math.floor(Math.random() * 4 + 3);
+        let newP = new Polygon([e.pageX * ratio, e.pageY * ratio], side);
+        polygonArr.push(newP);
+      }, false)
     });
   </script>
 </body>
