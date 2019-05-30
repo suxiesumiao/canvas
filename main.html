@@ -200,10 +200,10 @@
 
       function createPolygon() {
         let res = [];
-        for (let i = 0; i < 100; i++) {
-          let side = 6//Math.floor(Math.random() * 4 + 3);
-          let x = Math.random() * Math.cos(Math.random() * Math.PI) * minLeng + width / 2   //Math.floor(Math.random() * width);
-          let y = Math.random() * Math.sin((Math.random() - 0.5) * Math.PI) * minLeng + height / 2  //Math.floor(Math.random() * height);
+        for (let i = 0; i < 1000; i++) {
+          let side = 3//Math.floor(Math.random() * 4 + 3);
+          let x = 2 * minLeng * Math.random() * Math.cos(Math.PI * 2 * Math.random()) + width / 2   //Math.floor(Math.random() * width);
+          let y = 2 * minLeng * Math.random() * Math.sin(Math.PI * 2 * Math.random()) + height / 2  //Math.floor(Math.random() * height);
           res.push(new Polygon([x, y], side));
         }
         return res;
