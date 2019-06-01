@@ -48,11 +48,13 @@
       let ID = 0;
       let canvas = document.getElementById('canvas')
       const contex = canvas.getContext("2d");
+      const contex_2 = canvas.getContext("2d");
       // 获取设备的像素比
       let ratio = getPixelRatio(contex)
       let width = canvas.width = document.documentElement.clientWidth * ratio
       let height = canvas.height = document.documentElement.clientHeight * ratio
       let maxLeng = Math.max(width, height) / 2
+      let minLeng = Math.min(width, height) / 2
       // 高清屏幕缩放
       canvas.style.transform = `scale(${1 / ratio})`
       // 设备的像素比函数
@@ -69,8 +71,6 @@
       window.addEventListener('orientationchange' in window ? orientationchange : 'resize', function () {
         width = canvas.width = document.documentElement.clientWidth * ratio
         height = canvas.heigt = document.documentElement.clientHeight * ratio
-        // alert(canvas.width)
-        // canvas.style.transform = `scale(${1 / ratio})`
         cancelAnimationFrame(ID);
         paint();
       });
@@ -80,7 +80,7 @@
           x: center[0],
           y: center[1]
         }; //  中心点
-        // this.fillStyle = "#" + Math.random().toString(16).substr(2, 6) + "dd";
+        // this.fillStyle = "#" + Math.random().toString(16).substr(2, 6) + "ff";
         this.fillStyle = {
           r: parseInt(Math.random() * 255),
           g: parseInt(Math.random() * 255),
@@ -92,9 +92,9 @@
         this.vertexes = []; // 顶点数组
         this.graDire = -Math.PI / 2; //  加速度的方向
         this.graVlue = 1 //  加速度的数值
-        this.spinDire = 0.005 //  旋转方向
+        this.spinDire = 0.005  //  旋转方向
         this.dangle = (Math.random() * 2 * Math.PI); //  移动的方向 弧度表示
-        this.speed = (2 * Math.random() + 5) / this.side ** 2; // 移动方向的速度
+        this.speed = (2 * Math.random() + 5) / this.side ** 1; // 移动方向的速度
         this.vectorX = Math.cos(this.dangle) * this.speed; //  x方向的分速度
         this.vectorY = -Math.sin(this.dangle) * this.speed; //  y方向的分速度
         //
@@ -113,36 +113,43 @@
         }
       };
       Polygon.prototype.update = function () {
-        if (RANDOM) {
-          //  碰墙反弹
-          //-cox(x) = cos(Math.PI - x)
-          //-sin(y) = sin(-y)
-          if (this.center.x <= 0 || this.center.x >= width) {
-            this.spinDire = -this.spinDire
-            this.dangle = Math.PI - this.dangle;
-            this.vectorX = Math.cos(this.dangle) * this.speed;
-          }
-          if (this.center.y <= 0 || this.center.y >= height) {
-            this.spinDire = -this.spinDire
-            this.dangle = -this.dangle;
-            this.vectorY = -Math.sin(this.dangle) * this.speed;
-          }
-        } else {
-          //  穿墙循环
-          if (this.center.x <= -this.segment) {
-            this.center.x = width + this.segment
-            this.spinDire = -this.spinDire
-          } else if (this.center.x >= width + this.segment) {
-            this.center.x = -this.segment
-            this.spinDire = -this.spinDire
-          }
-          if (this.center.y <= -this.segment) {
-            this.center.y = height + this.segment
-            this.spinDire = -this.spinDire
-          } else if (this.center.y >= height + this.segment) {
-            this.center.y = -this.segment
-            this.spinDire = -this.spinDire
-          }
+        // if (RANDOM) {
+        //   //  碰墙反弹
+        //   //-cox(x) = cos(Math.PI - x)
+        //   //-sin(y) = sin(-y)
+        //   if (this.center.x <= 0 || this.center.x >= width) {
+        //     this.spinDire = -this.spinDire
+        //     this.dangle = Math.PI - this.dangle;
+        //     this.vectorX = Math.cos(this.dangle) * this.speed;
+        //   }
+        //   if (this.center.y <= 0 || this.center.y >= height) {
+        //     this.spinDire = -this.spinDire
+        //     this.dangle = -this.dangle;
+        //     this.vectorY = -Math.sin(this.dangle) * this.speed;
+        //   }
+        // } else {
+        //   //  穿墙循环
+        //   if (this.center.x <= -this.segment) {
+        //     this.center.x = width + this.segment
+        //     this.spinDire = -this.spinDire
+        //   } else if (this.center.x >= width + this.segment) {
+        //     this.center.x = -this.segment
+        //     this.spinDire = -this.spinDire
+        //   }
+        //   if (this.center.y <= -this.segment) {
+        //     this.center.y = height + this.segment
+        //     this.spinDire = -this.spinDire
+        //   } else if (this.center.y >= height + this.segment) {
+        //     this.center.y = -this.segment
+        //     this.spinDire = -this.spinDire
+        //   }
+        // }
+        if(Math.abs(this.center.x - width / 2) ** 2 + Math.abs(this.center.y - height / 2) ** 2 >= minLeng ** 2) {
+          this.dangle = this.dangle + Math.PI
+          this.vectorX = Math.cos(this.dangle) * this.speed;
+          this.vectorY = -Math.sin(this.dangle) * this.speed;
+          this.center.x = width / 2;
+          this.center.y = height / 2;
         }
         this.center.x += this.vectorX;
         this.center.y += this.vectorY;
@@ -155,7 +162,8 @@
         // const alpha = Math.floor(radius * 100 / maxLeng).toString(16);
         // console.log(alpha)
         let style = this.fillStyle;
-        contex.fillStyle = `rgb(${style.r},${style.g},${style.b},${0.8})`;
+        let alpha = (Math.abs(this.center.x - width / 2) ** 2 + Math.abs(this.center.y - height / 2) ** 2) / minLeng ** 2
+        contex.fillStyle = `rgb(${style.r},${style.g},${style.b},${1 - alpha})`;
         contex.beginPath();
         for (let k = 0; k < this.vertexes.length + 1; k++) {
           if (k === 0) {
@@ -182,52 +190,45 @@
 
       function createPolygon() {
         let res = [];
-        // let x = width / 2;
-        // let y = height / 2;
-        for (let i = 0; i < 100; i++) {
+        let x = width / 2;
+        let y = height / 2;
+        for (let i = 0; i < 1000; i++) {
           let side = Math.floor(Math.random() * 4 + 3);
-          let x = Math.floor(Math.random() * width);
-          let y = Math.floor(Math.random() * height);
+          // let x = width / 2 + Math.cos(Math.random() * 2 * Math.PI) * minLeng;
+          // let y = height / 2 - Math.sin(Math.random() * 2 * Math.PI) * minLeng;
           res.push(new Polygon([x, y], side));
         }
         return res;
       }
-
       function paint() {
         contex.clearRect(0, 0, width, height);
         for (let i = 0; i < polygonArr.length; i++) {
-          for (j = i + 1; j < polygonArr.length; j++) {
-            let sameSide = polygonArr[i].side === polygonArr[j].side
-            let len_2 = (polygonArr[i].center.x - polygonArr[j].center.x) ** 2 + (polygonArr[i].center.y -
-              polygonArr[j].center.y) ** 2
-            let len = Math.sqrt(len_2);
-            //碰撞监测 交换方向
-            // if(len < 15 * ratio * 2 && !sameSide) {
-            //   let tempDir = polygonArr[i].dangle;
-            //   polygonArr[i].dangle = polygonArr[j].dangle;
-            //   polygonArr[j].dangle = tempDir;
-            // }
-            if (len < 300 && sameSide) {
-              let alpha = (1 - (len / 300)).toString();
-              contex.beginPath();
-              contex.lineWidth = ratio;
-              contex.strokeStyle = `rgba(255,255,255,${alpha})`;
-              contex.moveTo(polygonArr[i].center.x, polygonArr[i].center.y);
-              contex.lineTo(polygonArr[j].center.x, polygonArr[j].center.y);
-              contex.stroke();
-              contex.closePath();
-            }
-          }
+          // for (j = i + 1; j < polygonArr.length; j++) {
+          //   let sameSide = polygonArr[i].side === polygonArr[j].side
+          //   let len_2 = (polygonArr[i].center.x - polygonArr[j].center.x) ** 2 + (polygonArr[i].center.y -
+          //     polygonArr[j].center.y) ** 2
+          //   let len = Math.sqrt(len_2);
+          //   if (len < 500 && sameSide) {
+          //     let alpha = (1 - (len / 500)).toString();
+          //     contex.beginPath();
+          //     contex.lineWidth = ratio;
+          //     contex.strokeStyle = `rgba(255,255,255,${alpha})`;
+          //     contex.moveTo(polygonArr[i].center.x, polygonArr[i].center.y);
+          //     contex.lineTo(polygonArr[j].center.x, polygonArr[j].center.y);
+          //     contex.stroke();
+          //     contex.closePath();
+          //   }
+          // }
           polygonArr[i].paint();
         }
         ID = requestAnimationFrame(paint);
       }
       paint();
-      canvas.addEventListener("click", function (e) {
-        let side = Math.floor(Math.random() * 4 + 3);
-        let newP = new Polygon([e.pageX * ratio, e.pageY * ratio], side);
-        polygonArr.push(newP);
-      }, false)
+      // canvas.addEventListener("click", function (e) {
+      //   let side = Math.floor(Math.random() * 4 + 3);
+      //   let newP = new Polygon([e.pageX * ratio, e.pageY * ratio], side);
+      //   polygonArr.push(newP);
+      // }, false)
     });
   </script>
 </body>
