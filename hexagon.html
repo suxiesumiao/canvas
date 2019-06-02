@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="theme-color" content="#1a1f3a">
+  <title>Birds Nest painted by canvas</title>
+  <style>
+    * {
+      margin: 0;
+    }
+
+    html {
+      background-color: #fff;
+      /* background-image: url("./apple.jpg"); */
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform-origin: top left;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    canvas:hover {
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <img style="width: 0; height: 0; display: none;" id="may" src="./may.jpg" alt="">
+  <canvas id="canvas"></canvas>
+  <canvas id="canvas_2"></canvas>
+  <script>
+    document.addEventListener("DOMContentLoaded", function (event) {
+      const RANDOM = new Date().getTime() % 2 === 0
+      const SEGMENT = 30;
+      const year = new Date().getFullYear();
+      let ID = 0;
+      const canvas = document.getElementById('canvas')
+      const contex = canvas.getContext("2d");
+      const canvas_2 = document.getElementById('canvas_2')
+      const contex_2 = canvas.getContext("2d");
+      // 获取设备的像素比
+      let ratio = getPixelRatio(contex)
+      let width = canvas_2.width = canvas.width = document.documentElement.clientWidth * ratio
+      let height = canvas_2.height = canvas.height = document.documentElement.clientHeight * ratio
+      let maxLeng = Math.max(width, height) / 2
+      // 高清屏幕缩放
+      canvas.style.transform = `scale(${1 / ratio})`
+      canvas_2.style.transform = `scale(${1 / ratio})`
+      // 设备的像素比函数
+      function getPixelRatio(context) {
+        var backingStore = context.backingStorePixelRatio ||
+          context.webkitBackingStorePixelRatio ||
+          context.mozBackingStorePixelRatio ||
+          context.msBackingStorePixelRatio ||
+          context.oBackingStorePixelRatio ||
+          context.backingStorePixelRatio || 1;
+        return (window.devicePixelRatio || 1) / backingStore;
+      };
+
+      window.addEventListener('orientationchange' in window ? orientationchange : 'resize', function () {
+        width = canvas_2.width = canvas.width = document.documentElement.clientWidth * ratio
+        height = canvas_2.heigt = canvas.heigt = document.documentElement.clientHeight * ratio
+        cancelAnimationFrame(ID);
+        paint();
+      });
+
+      function Polygon(center, side) {
+        this.center = {
+          x: center[0],
+          y: center[1]
+        }; //  中心点
+        this.fillStyle = {
+          r: parseInt(Math.random() * 255),
+          g: parseInt(Math.random() * 255),
+          b: parseInt(Math.random() * 255),
+          a: Math.random()
+        }
+        this.fillStyle = {
+          r: 35,
+          g: 44,
+          b: 97,
+          a: Math.random()
+        }
+        this.r = 0; //  初始转动角度
+        this.side = side; // 多边形的边数目
+        this.segment = SEGMENT; //  多边形中心点距离各个顶点的距离
+        this.vertexes = []; // 顶点数组
+        this.graDire = -Math.PI / 2; //  加速度的方向
+        this.graVlue = 1 //  加速度的数值
+        this.spinDire = 0 //0.005 //  旋转方向
+        this.dangle = Math.PI / 6 //(Math.random() * 2 * Math.PI); //  移动的方向 弧度表示
+        this.speed = (2 * Math.random() + 5) / this.side ** 2; // 移动方向的速度
+        this.vectorX = Math.cos(this.dangle) * this.speed; //  x方向的分速度
+        this.vectorY = -Math.sin(this.dangle) * this.speed; //  y方向的分速度
+        //
+        this.updateVertexes();
+      }
+      Polygon.prototype.updateVertexes = function () {
+        for (let i = 0; i < this.side; i++) {
+          this.vertexes[i] = {
+            x: this.center.x +
+              this.segment *
+              Math.cos((Math.PI * 2 * (i + 1)) / this.side + this.dangle + this.r),
+            y: this.center.y +
+              this.segment *
+              Math.sin((Math.PI * 2 * (i + 1)) / this.side + this.dangle + this.r)
+          };
+        }
+      };
+      Polygon.prototype.update = function () {
+        // this.center.x += this.vectorX;
+        // this.center.y += this.vectorY;
+        // this.r = this.r + this.spinDire;
+        // this.updateVertexes();
+        this.fillStyle.a += 0.001;
+        this.fillStyle.a = this.fillStyle.a > 1 ? 0 : this.fillStyle.a
+      };
+      Polygon.prototype.paint = function () {
+        let style = this.fillStyle;
+        contex.fillStyle = `rgb(${style.r},${style.g},${style.b},${style.a})`;
+        contex.beginPath();
+        for (let k = 0; k < this.vertexes.length + 1; k++) {
+          if (k === 0) {
+            contex.moveTo(this.vertexes[k].x, this.vertexes[k].y);
+          } else if (k === this.side) {
+            contex.lineTo(this.vertexes[0].x, this.vertexes[0].y);
+          } else {
+            contex.lineTo(this.vertexes[k].x, this.vertexes[k].y);
+          }
+        }
+        contex.shadowBlur = 5;
+        contex.shadowColor = `rgb(${style.r},${style.g},${style.b},${style.a})`;
+        contex.fill();
+        contex.closePath();
+        this.vectorX = Math.cos(this.dangle) * this.speed;
+        this.vectorY = -Math.sin(this.dangle) * this.speed;
+        this.update();
+      };
+
+
+      const gapX = SEGMENT * 2 * Math.cos(Math.PI / 12);
+      const gapY = gapX * Math.cos(Math.PI / 6);
+      const halfX = gapX / 2;
+
+      function createPolygon() {
+        let res = [];
+
+        const timesY = height / gapY + 1;
+        const timesX = width / gapX + 1;
+        const side = 6;
+        for (let i = 0; i < timesY; i++) {
+          let y = gapY * i;
+          for (let j = 0; j < timesX; j++) {
+            let x = gapX * j + (i % 2 === 1 ? halfX : 0);
+            res.push(new Polygon([x, y], side));
+          }
+        }
+        return res;
+      }
+      const polygonArr = createPolygon();
+
+      function paint() {
+        contex.clearRect(0, 0, width, height);
+        for (let i = 0; i < polygonArr.length; i++) {
+          polygonArr[i].paint();
+        }
+      }
+      paint();
+      contex_2.fillStyle = "red"
+      contex_2.beginPath();
+      contex_2.fillRect(halfX - 2, halfX * Math.sin(Math.PI / 6) - 2, 4, 4)
+      contex_2.closePath();
+    });
+  </script>
+</body>
+
+</html>
