@@ -13,7 +13,7 @@
     }
 
     html {
-      background-color: #fff;
+      background-color: #000;
       /* background-image: url("./apple.jpg"); */
       background-repeat: no-repeat;
       background-size: 100% 100%;
@@ -79,6 +79,7 @@
         height = canvas_2.heigt = canvas.heigt = document.documentElement.clientHeight * ratio
         cancelAnimationFrame(ID);
         paint();
+        paint_2();
       });
 
       function Polygon(center, side) {
@@ -155,7 +156,7 @@
       };
 
 
-      const gapX = SEGMENT * 2 * Math.cos(Math.PI / 12);
+      const gapX = SEGMENT * 2// * Math.cos(Math.PI / 12);
       const gapY = gapX * Math.cos(Math.PI / 6);
       const halfX = gapX / 2;
 
@@ -183,10 +184,13 @@
         }
       }
       paint();
-      contex_2.fillStyle = "red"
-      contex_2.beginPath();
-      contex_2.fillRect(halfX - 2, halfX * Math.sin(Math.PI / 6) - 2, 4, 4)
-      contex_2.closePath();
+      function paint_2() {
+        contex_2.fillStyle = "red"
+        contex_2.beginPath();
+        contex_2.fillRect(halfX - 2, halfX * Math.sin(Math.PI / 6), 4, 4)
+        contex_2.closePath();
+      };
+      paint_2();
     });
   </script>
 </body>
