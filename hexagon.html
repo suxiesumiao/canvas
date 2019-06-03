@@ -43,8 +43,8 @@
 
 <body>
   <img style="width: 0; height: 0; display: none;" id="may" src="./may.jpg" alt="">
-  <canvas id="canvas"></canvas>
   <canvas id="canvas_2"></canvas>
+  <canvas id="canvas"></canvas>
   <script>
     document.addEventListener("DOMContentLoaded", function (event) {
       const RANDOM = new Date().getTime() % 2 === 0
@@ -54,7 +54,7 @@
       const canvas = document.getElementById('canvas')
       const contex = canvas.getContext("2d");
       const canvas_2 = document.getElementById('canvas_2')
-      const contex_2 = canvas.getContext("2d");
+      const contex_2 = canvas_2.getContext("2d");
       // 获取设备的像素比
       let ratio = getPixelRatio(contex)
       let width = canvas_2.width = canvas.width = document.documentElement.clientWidth * ratio
@@ -95,9 +95,9 @@
         }
         this.fillStyle = {
           r: 35,
-          g: 44,
-          b: 97,
-          a: Math.random()
+          g: 46,
+          b: 101,
+          a: .6 //Math.random()
         }
         this.r = 0; //  初始转动角度
         this.side = side; // 多边形的边数目
@@ -152,11 +152,11 @@
         contex.closePath();
         this.vectorX = Math.cos(this.dangle) * this.speed;
         this.vectorY = -Math.sin(this.dangle) * this.speed;
-        this.update();
+        // this.update();
       };
 
 
-      const gapX = SEGMENT * 2// * Math.cos(Math.PI / 12);
+      const gapX = SEGMENT * 2
       const gapY = gapX * Math.cos(Math.PI / 6);
       const halfX = gapX / 2;
 
@@ -177,6 +177,7 @@
       }
       const polygonArr = createPolygon();
 
+
       function paint() {
         contex.clearRect(0, 0, width, height);
         for (let i = 0; i < polygonArr.length; i++) {
@@ -184,11 +185,44 @@
         }
       }
       paint();
-      function paint_2() {
-        contex_2.fillStyle = "red"
+
+      function Rect(x, y) {
+        this.center = {
+          x,
+          y
+        };
+        this.tick = 0;
+        this.rad = -Math.PI / 6;
+        this.segment = 150;
+      }
+      Rect.prototype.update = function () {
+        this.tick++
+        if (this.tick > 30) {
+          let random = (Math.random() > 0.5 ? 1 : -1);
+          this.rad = this.rad + (Math.PI / 3) * random;
+          this.tick = 0;
+        }
+        this.center.x = this.center.x + 1 * Math.cos(this.rad)
+        this.center.y = this.center.y - 1 * Math.sin(this.rad)
+      }
+      Rect.prototype.paint = function () {
+        contex_2.fillStyle = "rgba(255,0,0,0.2)"
         contex_2.beginPath();
-        contex_2.fillRect(halfX - 2, halfX * Math.sin(Math.PI / 6), 4, 4)
+        contex_2.fillRect(this.center.x - 2, this.center.y - 2, 4, 4)
         contex_2.closePath();
+      }
+      // let rec = new Rect(SEGMENT, SEGMENT * Math.tan(Math.PI / 6))
+      let rec = new Rect(width / 2, height / 2)
+
+      function paint_2() {
+        contex_2.globalCompositeOperation = 'source-over';
+        contex_2.fillStyle = "rgba(0,0,0,0.05)"
+        contex_2.fillRect(0, 0, width, height)
+        contex_2.globalCompositeOperation = 'lighter';
+
+        rec.paint();
+        requestAnimationFrame(paint_2)
+        rec.update();
       };
       paint_2();
     });

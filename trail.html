@@ -44,8 +44,6 @@
   <canvas id="canvas"></canvas>
   <script>
     document.addEventListener("DOMContentLoaded", function (event) {
-      const RANDOM = new Date().getTime() % 2 === 0
-      console.log(RANDOM)
       const year = new Date().getFullYear();
       let ID = 0;
       let canvas = document.getElementById('canvas')
@@ -83,13 +81,19 @@
           y: center[1]
         }; //  中心点
         this.fillStyle = "#" + Math.random().toString(16).substr(2, 6) + "33";
+        this.fillStyle = {
+          r: parseInt(Math.random() * 255),
+          g: parseInt(Math.random() * 255),
+          b: parseInt(Math.random() * 255),
+          a: 0.3
+        }
         this.r = 0; //  初始转动角度
         this.side = side; // 多边形的边数目
         this.segment = 15; //  多边形中心点距离各个顶点的距离
         this.vertexes = []; // 顶点数组
         this.graDire = -Math.PI / 2; //  加速度的方向
         this.graVlue = 1 //  加速度的数值
-        this.spinDire = 0.005  //  旋转方向
+        this.spinDire = 0.005 //  旋转方向
         this.dangle = (Math.random() * 2 * Math.PI); //  移动的方向 弧度表示
         this.speed = (2 * Math.random() + 10) / this.side; // 移动方向的速度
         this.vectorX = Math.cos(this.dangle) * this.speed; //  x方向的分速度
@@ -110,36 +114,18 @@
         }
       };
       Polygon.prototype.update = function () {
-        if (RANDOM) {
-          //  碰墙反弹
-          //-cox(x) = cos(Math.PI - x)
-          //-sin(y) = sin(-y)
-          if (this.center.x <= 0 || this.center.x >= width) {
-            this.spinDire = -this.spinDire
-            this.dangle = Math.PI - this.dangle;
-            this.vectorX = Math.cos(this.dangle) * this.speed;
-          }
-          if (this.center.y <= 0 || this.center.y >= height) {
-            this.spinDire = -this.spinDire
-            this.dangle = -this.dangle;
-            this.vectorY = -Math.sin(this.dangle) * this.speed;
-          }
-        } else {
-          //  穿墙循环
-          if (this.center.x <= -this.segment) {
-            this.center.x = width + this.segment
-            this.spinDire = -this.spinDire
-          } else if (this.center.x >= width + this.segment) {
-            this.center.x = -this.segment
-            this.spinDire = -this.spinDire
-          }
-          if (this.center.y <= -this.segment) {
-            this.center.y = height + this.segment
-            this.spinDire = -this.spinDire
-          } else if (this.center.y >= height + this.segment) {
-            this.center.y = -this.segment
-            this.spinDire = -this.spinDire
-          }
+        //  碰墙反弹
+        //-cox(x) = cos(Math.PI - x)
+        //-sin(y) = sin(-y)
+        if (this.center.x <= 0 || this.center.x >= width) {
+          this.spinDire = -this.spinDire
+          this.dangle = Math.PI - this.dangle;
+          this.vectorX = Math.cos(this.dangle) * this.speed;
+        }
+        if (this.center.y <= 0 || this.center.y >= height) {
+          this.spinDire = -this.spinDire
+          this.dangle = -this.dangle;
+          this.vectorY = -Math.sin(this.dangle) * this.speed;
         }
         this.center.x += this.vectorX;
         this.center.y += this.vectorY;
@@ -147,8 +133,8 @@
         this.updateVertexes();
       };
       Polygon.prototype.paint = function () {
-        contex.fillStyle = this.fillStyle;
-        // contex.strokeStyle = this.fillStyle;
+        let style = this.fillStyle;
+        contex.fillStyle = `rgb(${style.r},${style.g},${style.b},${style.a})`;
         contex.beginPath();
         for (let k = 0; k < this.vertexes.length + 1; k++) {
           if (k === 0) {
@@ -194,7 +180,7 @@
         let x = width / 2;
         let y = height / 2;
         for (let i = 0; i < 100; i++) {
-          let side = Math.floor(Math.random() * 4 + 3);
+          let side = Math.floor(Math.random() * 3 + 3);
           res.push(new Polygon([x, y], side));
         }
         return res;
