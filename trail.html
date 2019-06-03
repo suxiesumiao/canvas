@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#1a1f3a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="#1a1f3a">
-  <title>Birds Nest painted by canvas</title>
+  <title>Trail painted by canvas</title>
   <style>
     * {
       margin: 0;
@@ -72,8 +72,7 @@
       window.addEventListener('orientationchange' in window ? orientationchange : 'resize', function () {
         width = canvas.width = document.documentElement.clientWidth * ratio
         height = canvas.heigt = document.documentElement.clientHeight * ratio
-        // alert(canvas.width)
-        // canvas.style.transform = `scale(${1 / ratio})`
+        canvas.style.transform = `scale(${1 / ratio})`
         cancelAnimationFrame(ID);
         paint();
       });
@@ -83,7 +82,7 @@
           x: center[0],
           y: center[1]
         }; //  中心点
-        this.fillStyle = "#" + Math.random().toString(16).substr(2, 6) + "dd";
+        this.fillStyle = "#" + Math.random().toString(16).substr(2, 6) + "33";
         this.r = 0; //  初始转动角度
         this.side = side; // 多边形的边数目
         this.segment = 15 * ratio; //  多边形中心点距离各个顶点的距离
@@ -92,7 +91,7 @@
         this.graVlue = 1 //  加速度的数值
         this.spinDire = 0.005  //  旋转方向
         this.dangle = (Math.random() * 2 * Math.PI); //  移动的方向 弧度表示
-        this.speed = (2 * Math.random() + 5) / this.side ** 2; // 移动方向的速度
+        this.speed = (2 * Math.random() + 5) / this.side ** 1; // 移动方向的速度
         this.vectorX = Math.cos(this.dangle) * this.speed; //  x方向的分速度
         this.vectorY = -Math.sin(this.dangle) * this.speed; //  y方向的分速度
         //
@@ -145,14 +144,11 @@
         this.center.x += this.vectorX;
         this.center.y += this.vectorY;
         this.r = this.r + this.spinDire;
-        // this.segment = (this.segment < 15 * ratio ? this.segment + 0.01 : 15 * ratio)
         this.updateVertexes();
       };
       Polygon.prototype.paint = function () {
-        // const radius = Math.sqrt((this.center.x - width / 2) ** 2 + (this.center.y - height / 2) ** 2);
-        // const alpha = Math.floor(radius * 100 / maxLeng).toString(16);
-        // console.log(alpha)
         contex.fillStyle = this.fillStyle;
+        // contex.strokeStyle = this.fillStyle;
         contex.beginPath();
         for (let k = 0; k < this.vertexes.length + 1; k++) {
           if (k === 0) {
@@ -163,17 +159,12 @@
             contex.lineTo(this.vertexes[k].x, this.vertexes[k].y);
           }
         }
-
+        // contex.stroke();
         contex.fill();
         contex.closePath();
-        // contex.beginPath();
-        // contex.strokeStyle = "#181818"
-        // contex.arc(this.center.x, this.center.y, this.segment, 0, Math.PI * 2, true);
-        // contex.stroke();
-        // contex.closePath()
         this.vectorX = Math.cos(this.dangle) * this.speed;
         this.vectorY = -Math.sin(this.dangle) * this.speed;
-        // this.update();
+        this.update();
       };
       /**
        * { start } 起始标志位
@@ -200,26 +191,27 @@
 
       function createPolygon() {
         let res = [];
-        for (let i = 0; i < 1000; i++) {
-          let side = 3//Math.floor(Math.random() * 4 + 3);
-          let x = 2 * minLeng * Math.random() * Math.cos(Math.PI * 2 * Math.random()) + width / 2   //Math.floor(Math.random() * width);
-          let y = 2 * minLeng * Math.random() * Math.sin(Math.PI * 2 * Math.random()) + height / 2  //Math.floor(Math.random() * height);
+        let x = width / 2;
+        let y = height / 2;
+        for (let i = 0; i < 100; i++) {
+          let side = Math.floor(Math.random() * 4 + 3);
+          //let x = 2 * minLeng * Math.random() * Math.cos(Math.PI * 2 * Math.random()) + width / 2   //Math.floor(Math.random() * width);
+          //let y = 2 * minLeng * Math.random() * Math.sin(Math.PI * 2 * Math.random()) + height / 2  //Math.floor(Math.random() * height);
           res.push(new Polygon([x, y], side));
         }
         return res;
       }
 
       function paint() {
-        contex.clearRect(0, 0, width, height);
+        contex.globalCompositeOperation = 'source-over';
+        // contex.shadowBlur = 1;
+        contex.fillStyle = "rgba(0,0,0,0.1)"
+        contex.fillRect(0, 0, width, height);
+        contex.globalCompositeOperation = 'lighter';
         for (let i = 0; i < polygonArr.length; i++) {
           polygonArr[i].paint();
         }
         ID = requestAnimationFrame(paint);
-        contex.beginPath();
-        contex.strokeStyle = "#ff0000"
-        contex.arc(width / 2, height / 2, minLeng, 0, Math.PI * 2, true)
-        contex.stroke()
-        contex.closePath();
       }
       paint();
       canvas.addEventListener("click", function (e) {

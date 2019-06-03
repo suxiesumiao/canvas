@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    #main {
+      padding: 20px;
+      border: 1px solid tomato;
+    }
+
+    li {
+      padding: 5px 0;
+      margin-bottom: 5px;
+      list-style-type: none;
+      overflow: hidden;
+    }
+
+    li span {
+      /* box-shadow: inset 0 0 0 1px aqua; */
+    }
+
+    li span.time {
+      float: left;
+      position: relative;
+      padding: 5px;
+      color: chocolate;
+    }
+
+    li span.time::after {
+      position: absolute;
+      top: calc(50% - 8px);
+      right: -18px;
+      content: "";
+      display: block;
+      width: 16px;
+      height: 16px;
+      border-radius: 8px;
+      background-color: gray;
+    }
+
+    li span.content {
+      float: left;
+      width: 200px;
+      position: relative;
+      margin-left: 20px;
+      padding: 5px;
+      color: darkolivegreen;
+    }
+
+    li:not(:last-of-type) span.content::before {
+      position: absolute;
+      top: 25px;
+      left: -11px;
+      content: "";
+      display: block;
+      width: 2px;
+      height: 100%;
+      border-radius: 10px;
+      background-color: gray;
+    }
+  </style>
+</head>
+
+<body>
+  <ul id="main">
+    <li>
+      <span class="time">
+        2018-06-03
+      </span>
+      <span class="content">
+        货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港
+      </span>
+    </li>
+    <li>
+      <span class="time">
+        2018-06-03
+      </span>
+      <span class="content">
+        货物离开张家港货物到达张家港货物到达张家港
+      </span>
+    </li>
+    <li>
+      <span class="time">
+        2018-06-03
+      </span>
+      <span class="content">
+        货物又返回了张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港货物到达张家港
+      </span>
+    </li>
+    <li>
+      <span class="time">
+        2018-06-03
+      </span>
+      <span class="content">
+        货物中途丢了
+      </span>
+    </li>
+  </ul>
+</body>
+
+</html>
