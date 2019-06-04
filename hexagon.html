@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <meta name="theme-color" content="#1a1f3a">
-  <title>Birds Nest painted by canvas</title>
+  <title>Infenal Fire painted by canvas</title>
   <style>
     * {
       margin: 0;
@@ -51,6 +51,7 @@
       const SEGMENT = 30;
       const year = new Date().getFullYear();
       let ID = 0;
+      let ID_2 = 0;
       const canvas = document.getElementById('canvas')
       const contex = canvas.getContext("2d");
       const canvas_2 = document.getElementById('canvas_2')
@@ -78,6 +79,7 @@
         width = canvas_2.width = canvas.width = document.documentElement.clientWidth * ratio
         height = canvas_2.heigt = canvas.heigt = document.documentElement.clientHeight * ratio
         cancelAnimationFrame(ID);
+        cancelAnimationFrame(ID_2);
         paint();
         paint_2();
       });
@@ -97,7 +99,7 @@
           r: 35,
           g: 46,
           b: 101,
-          a: .6 //Math.random()
+          a: 1 //Math.random()
         }
         this.r = 0; //  初始转动角度
         this.side = side; // 多边形的边数目
@@ -146,8 +148,8 @@
             contex.lineTo(this.vertexes[k].x, this.vertexes[k].y);
           }
         }
-        contex.shadowBlur = 5;
-        contex.shadowColor = `rgb(${style.r},${style.g},${style.b},${style.a})`;
+        // contex.shadowBlur = 5;
+        // contex.shadowColor = `rgb(${style.r},${style.g},${style.b},${style.a})`;
         contex.fill();
         contex.closePath();
         this.vectorX = Math.cos(this.dangle) * this.speed;
@@ -191,38 +193,55 @@
           x,
           y
         };
-        this.tick = 0;
-        this.rad = -Math.PI / 6;
+        this.tik = 0;
+        this.tok = 0;
+        this.hug = 0;
+        this.rad = (Math.PI / 3) * (Math.random() > 0.5 ? 1 : -1);
         this.segment = 150;
       }
       Rect.prototype.update = function () {
-        this.tick++
-        if (this.tick > 30) {
+        this.tik++
+        this.tok++
+        if (this.tik > 30) {
           let random = (Math.random() > 0.5 ? 1 : -1);
           this.rad = this.rad + (Math.PI / 3) * random;
-          this.tick = 0;
+          this.tik = 0;
+        }
+        if (this.tok > 600) {
+          this.hug += 10;
+          this.center = {
+            x: width / 2,
+            y: height / 2
+          }
+          this.hug = this.hug > 360 ? 0 : this.hug
+          this.tok = 0;
         }
         this.center.x = this.center.x + 1 * Math.cos(this.rad)
         this.center.y = this.center.y - 1 * Math.sin(this.rad)
       }
       Rect.prototype.paint = function () {
-        contex_2.fillStyle = "rgba(255,0,0,0.2)"
+        contex_2.fillStyle = `hsla(${this.hug},90%,55%,0.5)`
         contex_2.beginPath();
         contex_2.fillRect(this.center.x - 2, this.center.y - 2, 4, 4)
         contex_2.closePath();
+        this.update();
       }
       // let rec = new Rect(SEGMENT, SEGMENT * Math.tan(Math.PI / 6))
       let rec = new Rect(width / 2, height / 2)
-
+      let recs = [];
       function paint_2() {
         contex_2.globalCompositeOperation = 'source-over';
         contex_2.fillStyle = "rgba(0,0,0,0.05)"
         contex_2.fillRect(0, 0, width, height)
         contex_2.globalCompositeOperation = 'lighter';
-
         rec.paint();
-        requestAnimationFrame(paint_2)
-        rec.update();
+        for (let i = 0; i < recs.length; i++) {
+          recs[i].paint();
+        }
+        if (recs.length < 500) {
+          recs.push(new Rect(width / 2, height / 2))
+        }
+        ID_2 = requestAnimationFrame(paint_2)
       };
       paint_2();
     });
