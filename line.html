@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="theme-color" content="#1a1f3a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#1a1f3a">
+  <title>painted by canvas</title>
+  <style>
+    * {
+      margin: 0;
+    }
+
+    html {
+      background-color: #1a1f3a;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform-origin: top left;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    canvas:hover {
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="canvas"></canvas>
+  <script>
+    document.addEventListener("DOMContentLoaded", function (event) {
+      let ID = 0;
+      let canvas = document.getElementById('canvas')
+      const contex = canvas.getContext("2d");
+      // 获取设备的像素比
+      let ratio = getPixelRatio(contex)
+      let width = canvas.width = document.documentElement.clientWidth * ratio
+      let height = canvas.height = document.documentElement.clientHeight * ratio
+      let maxLeng = Math.max(width, height) / 2
+      // 高清屏幕缩放
+      canvas.style.transform = `scale(${1 / ratio})`
+      // 设备的像素比函数
+      function getPixelRatio(context) {
+        var backingStore = context.backingStorePixelRatio ||
+          context.webkitBackingStorePixelRatio ||
+          context.mozBackingStorePixelRatio ||
+          context.msBackingStorePixelRatio ||
+          context.oBackingStorePixelRatio ||
+          context.backingStorePixelRatio || 1;
+        return (window.devicePixelRatio || 1) / backingStore;
+      };
+
+      window.addEventListener('orientationchange' in window ? orientationchange : 'resize', function () {
+        width = canvas.width = document.documentElement.clientWidth * ratio
+        height = canvas.heigt = document.documentElement.clientHeight * ratio
+        cancelAnimationFrame(ID);
+        paint();
+      });
+      const DIR = Math.PI / 2
+
+      function Point(args) {
+        this.dir = args.dir; //  前进方向
+        this.x = args.x;
+        this.y = args.y;
+        this.speed = Math.floor(Math.random() * 2 + 2)
+      }
+      Point.prototype.update = function () {
+        switch (this.dir) {
+          case 0:
+            this.x += this.speed;
+            if (this.x > width) {
+              this.x = width;
+              if (this.y === 0) {
+                this.dir = Math.PI / 2
+              } else {
+                this.dir = -Math.PI / 2
+              }
+            }
+            break;
+          case Math.PI / 2:
+            this.y += this.speed
+            if (this.y > height) {
+              this.y = height;
+              if (this.x === 0) {
+                this.dir = 0
+              } else {
+                this.dir = Math.PI
+              }
+            }
+            break;
+          case Math.PI:
+            this.x -= this.speed;
+            if (this.x < 0) {
+              this.x = 0;
+              if (this.y === 0) {
+                this.dir = Math.PI / 2
+              } else {
+                this.dir = -Math.PI / 2
+              }
+            }
+            break;
+          case -Math.PI / 2:
+            this.y -= this.speed
+            if (this.y < 0) {
+              this.y = 0;
+              if (this.x === 0) {
+                this.dir = 0
+              } else {
+                this.dir = Math.PI
+              }
+            }
+            break;
+          default:
+        }
+      }
+
+      function Line(self) {
+        this.self = {
+          head: new Point({
+            x: width * Math.random(),
+            y: 0,
+            dir: Math.PI
+          }),
+          tail: new Point({
+            x: width * Math.random(),
+            y: height,
+            dir: 0
+          })
+        }
+      }
+      Line.prototype.update = function () {
+        this.self.head.update();
+        this.self.tail.update();
+      };
+      Line.prototype.paint = function () {
+        contex.beginPath();
+        contex.strokeStyle = "#ff00ff88"
+        contex.moveTo(this.self.head.x, this.self.head.y);
+        contex.lineTo(this.self.tail.x, this.self.tail.y);
+        contex.stroke();
+        contex.closePath();
+        this.update();
+      };
+      const LineArr = createLine();
+
+      function createLine() {
+        let res = [];
+        for (let i = 0; i < 10; i++) {
+          res.push(new Line());
+        }
+        return res;
+      }
+
+      function paint() {
+        // contex.clearRect(0, 0, width, height);
+        contex.globalCompositeOperation = 'source-over';
+        contex.fillStyle = "rgba(0,0,0,0.05)"
+        contex.fillRect(0, 0, width, height)
+        contex.globalCompositeOperation = 'lighter';
+        for (let i = 0; i < LineArr.length; i++) {
+          LineArr[i].paint();
+        }
+        ID = requestAnimationFrame(paint);
+      }
+      paint();
+      canvas.addEventListener("click", function (e) {}, false)
+    });
+  </script>
+</body>
+
+</html>
