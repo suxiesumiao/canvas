@@ -167,11 +167,11 @@
       }
 
       function paint() {
-        // contex.clearRect(0, 0, width, height);
-        contex.globalCompositeOperation = 'source-over';
-        contex.fillStyle = "rgba(0,0,0,0.05)"
-        contex.fillRect(0, 0, width, height)
-        contex.globalCompositeOperation = 'lighter';
+        contex.clearRect(0, 0, width, height);
+        // contex.globalCompositeOperation = 'source-over';
+        // contex.fillStyle = "rgba(0,0,0,0.05)"
+        // contex.fillRect(0, 0, width, height)
+        // contex.globalCompositeOperation = 'lighter';
         for (let i = 0; i < LineArr.length; i++) {
           LineArr[i].paint();
         }

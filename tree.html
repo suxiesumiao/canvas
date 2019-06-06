@@ -46,7 +46,7 @@
   <script>
     document.addEventListener("DOMContentLoaded", function (event) {
       const RANDOM = new Date().getTime() % 2 === 0
-      const SEGMENT = 30;
+      const SEGMENT = 10;
       const year = new Date().getFullYear();
       let ID = 0;
       let ID_2 = 0;
@@ -205,7 +205,7 @@
         if (this.tik > 20) {
           let random = (Math.random() > 0.5 ? 1 : -1);
           //  Math.PI / 18 枝叶交叉的角度
-          this.rad = this.rad + (Math.PI / 36) * random;
+          this.rad = this.rad + (Math.PI / 20) * random;
           this.tik = 0;
         }
         if (this.tok > 800) {
@@ -237,7 +237,7 @@
         for (let i = 0; i < recs.length; i++) {
           recs[i].paint();
         }
-        if (recs.length < 1000) {
+        if (recs.length < 3000) {
           recs.push(new Rect(TreeCenter.x, TreeCenter.y))
         }
         ID_2 = requestAnimationFrame(paint_2)
