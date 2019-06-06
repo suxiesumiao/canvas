@@ -95,9 +95,9 @@
         }
         this.fillStyle = {
           r: 35,
-          g: 46,
-          b: 101,
-          a: .32 //Math.random()
+          g: 45,
+          b: 110,
+          a: Math.random() * 0.5 + 0.5
         }
         this.r = 0; //  初始转动角度
         this.side = side; // 多边形的边数目
@@ -225,7 +225,7 @@
       Rect.prototype.paint = function () {
         contex_2.fillStyle = `hsla(${this.hug},90%,50%,0.3)`
         contex_2.beginPath();
-        contex_2.fillRect(this.center.x - 1, this.center.y - 1, 2, 2)
+        contex_2.fillRect(this.center.x - 1, this.center.y - 1, 3, 3)
         contex_2.closePath();
         this.update();
       }
