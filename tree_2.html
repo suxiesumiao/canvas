@@ -6,7 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <meta name="theme-color" content="#1a1f3a">
-  <title>Birds Nest painted by canvas</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#1a1f3a">
+  <title>Tree painted by canvas</title>
   <style>
     * {
       margin: 0;
@@ -43,18 +45,15 @@
   <script>
     document.addEventListener("DOMContentLoaded", function (event) {
       const RANDOM = new Date().getTime() % 2 === 0
-      console.log(RANDOM)
       const year = new Date().getFullYear();
       let ID = 0;
       let canvas = document.getElementById('canvas')
       const contex = canvas.getContext("2d");
-      const contex_2 = canvas.getContext("2d");
       // 获取设备的像素比
       let ratio = getPixelRatio(contex)
       let width = canvas.width = document.documentElement.clientWidth * ratio
       let height = canvas.height = document.documentElement.clientHeight * ratio
       let maxLeng = Math.max(width, height) / 2
-      let minLeng = Math.min(width, height) / 2
       // 高清屏幕缩放
       canvas.style.transform = `scale(${1 / ratio})`
       // 设备的像素比函数
@@ -71,16 +70,18 @@
       window.addEventListener('orientationchange' in window ? orientationchange : 'resize', function () {
         width = canvas.width = document.documentElement.clientWidth * ratio
         height = canvas.heigt = document.documentElement.clientHeight * ratio
+        // alert(canvas.width)
+        // canvas.style.transform = `scale(${1 / ratio})`
         cancelAnimationFrame(ID);
         paint();
       });
 
-      function Polygon(center, side) {
+      function Tree(center, side) {
         this.center = {
           x: center[0],
           y: center[1]
         }; //  中心点
-        // this.fillStyle = "#" + Math.random().toString(16).substr(2, 6) + "ff";
+        // this.fillStyle = "#" + Math.random().toString(16).substr(2, 6) + "dd";
         this.fillStyle = {
           r: parseInt(Math.random() * 255),
           g: parseInt(Math.random() * 255),
@@ -92,15 +93,15 @@
         this.vertexes = []; // 顶点数组
         this.graDire = -Math.PI / 2; //  加速度的方向
         this.graVlue = 1 //  加速度的数值
-        this.spinDire = 0.005  //  旋转方向
+        this.spinDire = 0.005 //  旋转方向
         this.dangle = (Math.random() * 2 * Math.PI); //  移动的方向 弧度表示
-        this.speed = (2 * Math.random() + 5) / this.side ** 1; // 移动方向的速度
+        this.speed = (2 * Math.random() + 5) / this.side ** 2; // 移动方向的速度
         this.vectorX = Math.cos(this.dangle) * this.speed; //  x方向的分速度
         this.vectorY = -Math.sin(this.dangle) * this.speed; //  y方向的分速度
         //
         this.updateVertexes();
       }
-      Polygon.prototype.updateVertexes = function () {
+      Tree.prototype.updateVertexes = function () {
         for (let i = 0; i < this.side; i++) {
           this.vertexes[i] = {
             x: this.center.x +
@@ -112,58 +113,46 @@
           };
         }
       };
-      Polygon.prototype.update = function () {
-        // if (RANDOM) {
-        //   //  碰墙反弹
-        //   //-cox(x) = cos(Math.PI - x)
-        //   //-sin(y) = sin(-y)
-        //   if (this.center.x <= 0 || this.center.x >= width) {
-        //     this.spinDire = -this.spinDire
-        //     this.dangle = Math.PI - this.dangle;
-        //     this.vectorX = Math.cos(this.dangle) * this.speed;
-        //   }
-        //   if (this.center.y <= 0 || this.center.y >= height) {
-        //     this.spinDire = -this.spinDire
-        //     this.dangle = -this.dangle;
-        //     this.vectorY = -Math.sin(this.dangle) * this.speed;
-        //   }
-        // } else {
-        //   //  穿墙循环
-        //   if (this.center.x <= -this.segment) {
-        //     this.center.x = width + this.segment
-        //     this.spinDire = -this.spinDire
-        //   } else if (this.center.x >= width + this.segment) {
-        //     this.center.x = -this.segment
-        //     this.spinDire = -this.spinDire
-        //   }
-        //   if (this.center.y <= -this.segment) {
-        //     this.center.y = height + this.segment
-        //     this.spinDire = -this.spinDire
-        //   } else if (this.center.y >= height + this.segment) {
-        //     this.center.y = -this.segment
-        //     this.spinDire = -this.spinDire
-        //   }
-        // }
-        if(Math.abs(this.center.x - width / 2) ** 2 + Math.abs(this.center.y - height / 2) ** 2 >= minLeng ** 2) {
-          this.dangle = this.dangle + Math.PI
-          this.vectorX = Math.cos(this.dangle) * this.speed;
-          this.vectorY = -Math.sin(this.dangle) * this.speed;
-          this.center.x = width / 2;
-          this.center.y = height / 2;
+      Tree.prototype.update = function () {
+        if (RANDOM) {
+          //  碰墙反弹
+          //-cox(x) = cos(Math.PI - x)
+          //-sin(y) = sin(-y)
+          if (this.center.x <= 0 || this.center.x >= width) {
+            this.spinDire = -this.spinDire
+            this.dangle = Math.PI - this.dangle;
+            this.vectorX = Math.cos(this.dangle) * this.speed;
+          }
+          if (this.center.y <= 0 || this.center.y >= height) {
+            this.spinDire = -this.spinDire
+            this.dangle = -this.dangle;
+            this.vectorY = -Math.sin(this.dangle) * this.speed;
+          }
+        } else {
+          //  穿墙循环
+          if (this.center.x <= -this.segment) {
+            this.center.x = width + this.segment
+            this.spinDire = -this.spinDire
+          } else if (this.center.x >= width + this.segment) {
+            this.center.x = -this.segment
+            this.spinDire = -this.spinDire
+          }
+          if (this.center.y <= -this.segment) {
+            this.center.y = height + this.segment
+            this.spinDire = -this.spinDire
+          } else if (this.center.y >= height + this.segment) {
+            this.center.y = -this.segment
+            this.spinDire = -this.spinDire
+          }
         }
         this.center.x += this.vectorX;
         this.center.y += this.vectorY;
         this.r = this.r + this.spinDire;
-        // this.segment = (this.segment < 15 * ratio ? this.segment + 0.01 : 15 * ratio)
         this.updateVertexes();
       };
-      Polygon.prototype.paint = function () {
-        // const radius = Math.sqrt((this.center.x - width / 2) ** 2 + (this.center.y - height / 2) ** 2);
-        // const alpha = Math.floor(radius * 100 / maxLeng).toString(16);
-        // console.log(alpha)
+      Tree.prototype.paint = function () {
         let style = this.fillStyle;
-        let alpha = (Math.abs(this.center.x - width / 2) ** 2 + Math.abs(this.center.y - height / 2) ** 2) / minLeng ** 2
-        contex.fillStyle = `rgb(${style.r},${style.g},${style.b},${1 - alpha})`;
+        contex.fillStyle = `rgb(${style.r},${style.g},${style.b},${.9})`;
         contex.beginPath();
         for (let k = 0; k < this.vertexes.length + 1; k++) {
           if (k === 0) {
@@ -177,39 +166,31 @@
 
         contex.fill();
         contex.closePath();
-        // contex.beginPath();
-        // contex.strokeStyle = "#181818"
-        // contex.arc(this.center.x, this.center.y, this.segment, 0, Math.PI * 2, true);
-        // contex.stroke();
-        // contex.closePath()
         this.vectorX = Math.cos(this.dangle) * this.speed;
         this.vectorY = -Math.sin(this.dangle) * this.speed;
         this.update();
       };
+      const TreeArr = createTree();
 
-      function createPolygon() {
-        let x = width / 2;
-        let y = height / 2;
-        let side = Math.floor(Math.random() * 4 + 3);
-        return new Polygon([x, y], side)
+      function createTree() {
+        let res = [];
+        for (let i = 0; i < 100; i++) {
+          let side = Math.floor(Math.random() * 4 + 3);
+          let x = Math.floor(Math.random() * width);
+          let y = Math.floor(Math.random() * height);
+          res.push(new Tree([x, y], side));
+        }
+        return res;
       }
-      const polygonArr = [createPolygon()];
+
       function paint() {
         contex.clearRect(0, 0, width, height);
-        for (let i = 0; i < polygonArr.length; i++) {
-          polygonArr[i].paint();
-        }
-        if(polygonArr.length < 1000) {
-          polygonArr.unshift(createPolygon())
+        for (let i = 0; i < TreeArr.length; i++) {
+          TreeArr[i].paint();
         }
         ID = requestAnimationFrame(paint);
       }
       paint();
-      // canvas.addEventListener("click", function (e) {
-      //   let side = Math.floor(Math.random() * 4 + 3);
-      //   let newP = new Polygon([e.pageX * ratio, e.pageY * ratio], side);
-      //   polygonArr.push(newP);
-      // }, false)
     });
   </script>
 </body>
