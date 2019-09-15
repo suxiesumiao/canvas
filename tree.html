@@ -202,19 +202,18 @@
       Rect.prototype.update = function () {
         this.tik++
         this.tok++
-        if (this.tik > 20) {
+        if (this.tik > 20 * ratio) {
           let random = (Math.random() > 0.5 ? 1 : -1);
           //  Math.PI / 18 枝叶交叉的角度
           this.rad = this.rad + (Math.PI / 20) * random;
           this.tik = 0;
         }
-        if (this.tok > 800) {
-          this.hug += 10;
+        if (this.tok > 800 * ratio) {
           this.center = {
             x: TreeCenter.x,
             y: TreeCenter.y
           }
-          this.hug = this.hug > 360 ? 0 : this.hug
+          this.hug = this.hug > 360 ? 0 : this.hug + 10;
           this.rad = (Math.PI / 2)
           this.tok = 0;
         }
