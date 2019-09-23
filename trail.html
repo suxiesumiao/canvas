@@ -83,7 +83,7 @@
         this.fillHug = Math.random() * 3600
         this.r = 0; //  初始转动角度
         this.side = side; // 多边形的边数目
-        this.segment = 15; //  多边形中心点距离各个顶点的距离
+        this.segment = 15 * ratio; //  多边形中心点距离各个顶点的距离
         this.vertexes = []; // 顶点数组
         this.graDire = -Math.PI / 2; //  加速度的方向
         this.graVlue = 1 //  加速度的数值
