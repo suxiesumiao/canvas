@@ -158,6 +158,7 @@
         // console.log(alpha)
         let style = this.fillStyle;
         contex.fillStyle = `rgb(${style.r},${style.g},${style.b},${.9})`;
+        style=null;
         contex.beginPath();
         for (let k = 0; k < this.vertexes.length + 1; k++) {
           if (k === 0) {
@@ -218,11 +219,16 @@
               contex.lineTo(polygonArr[j].center.x, polygonArr[j].center.y);
               contex.stroke();
               contex.closePath();
+              alpha = null;
             }
+            sameSide = null;
+            len_2 = null;
+            len = null;
           }
           polygonArr[i].paint();
         }
         ID = requestAnimationFrame(paint);
+        // ID=setTimeout(paint, 100);
       }
       paint();
       canvas.addEventListener("click", function (e) {
